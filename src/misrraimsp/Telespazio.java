@@ -1,6 +1,8 @@
 package misrraimsp;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -38,7 +40,10 @@ public class Telespazio {
                     "(relative to the program location), and as second argument a positive integer");
             return;
 	    }
-	    int maxAllowedRate = Integer.parseInt(args[1]);
+        Path path = Paths.get(args[0]);
+        String directory = path.getParent().toString();
+
+        int maxAllowedRate = Integer.parseInt(args[1]);
 
         /*
          * 2. Gather input info from file
@@ -116,7 +121,7 @@ public class Telespazio {
         String message = "{maxAllowedRate:" + maxAllowedRate + ",currentMaxRate:" + currentMaxRate + "}";
         String outputFileName = "out.txt";
         try {
-            BufferedWriter bw = new BufferedWriter(new FileWriter(outputFileName));
+            BufferedWriter bw = new BufferedWriter(new FileWriter(directory + "/" + outputFileName));
             if (currentMaxRate > maxAllowedRate) bw.write("EXCEEDS " + message);
             else bw.write("OK " + message);
             bw.newLine();
