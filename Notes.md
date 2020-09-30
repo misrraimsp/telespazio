@@ -1,12 +1,18 @@
 # Implementation Notes
 
-- En el archivo de muestra todos los tiempos coinciden en horas a en punto y a y media. Pero sólo se especifica que la ventana mínima es de media hora, no que tenga que ser algún múltiplo de 30 minutos. No se especifica en la documentación la precisión en las medidas de tiempo, así que se asume que es 1 minuto.
-- Del dominio del problema se entiende que el tiempo de comunicación (X) y el de no comunicación (Y) son cíclicos, es decir, X minutos comunicando, seguidos de Y minutos sin comunicar, y otra vez inicio de X minutos comunicando: X, Y, X, Y, X, Y ...
-- La suma de X + Y se entiende que es 24 horas (= 1440 minutos). Esta suposición se basa en la información contenida en el fichero de ejemplo, ya que este contiene información temporal en formato hh:mm. Si el ciclo fuese mayor que 24h se necesitaría especificar el paso de un día a otro.
-- Si, en el fichero de entrada, el tiempo de inicio coincide con el tiempo de fin, se interpreta como que el satélite es geostacionario y que constantemente se encuentra transmitiendo a la base. Siguiendo con la nomenclatura anterior, sería el caso de (X = 1440, Y = 0).
-- Si un satélite nunca transmitiese, es decir (X = 0, Y = 1440), se entiende que dicho satélite no estaría en el fichero.
-- El tiempo disponible se va a modelar como un vector de 1440 valores, en el que el índice 0 corresponde al punto temporal 00:00, y el índice 1439 corresponde a las 23:59.
-- El concepto de total downlink se interpreta como los datos totales descargados durante una ventana de media hora. Equivaldría al cálculo de la integral de la curva de ratio, para un intervalo de media hora.
-- No existe necesariamente unicidad en la ventana de media hora con máxima carga. Se pueden encontrar múltiples ventanas de 30 minutos con carga máxima. Por ejemplo, un único satélite geoestacionario produciría (1440 - 30) = 1410 ventanas de carga máxima. Por ello, el programa desarrollado devuelve un vector con los periodos de carga máxima encontrados.
-- Este vector de periodos de carga máxima se escribe en un fichero de forma muy similar al tomado a la entrada. Es igual pero suprimiendo los campos de nombre y ratio de bajada: **hh:mm,hh:mm**
+- In the sample file all times coincide in hours at o'clock and at half past. But it is only specified that the minimum window is half an hour, not that it has to be some multiple of 30 minutes. Accuracy in time measurements is not specified in the documentation, so it is assumed to be 1 minute.
+- From the problem domain it is assumed that the communication time (*X*) and the non-communication time (*Y*) are cyclical: *X* minutes communicating, followed by *Y* minutes without communicating, and again starting with *X* minutes communicating and so on (*X*,*Y*,*X*,*Y*,*X*,*Y* ...)
+- The *X*+*Y* sum is assumed to be 24 hours (=1440 minutes). This assumption is based on the information available in the sample file, as it contains temporary data in *hh:mm* format. If the cycle *X*+*Y* were greater than 24h, it would be necessary to specify the passage from one day to another.
+- If the start time coincides with the end time, it is interpreted as that the satellite is geostationary and that it is constantly transmitting to the base. According with the previous nomenclature, it would be the case of (*X*=1440, *Y*=0).
+- If a satellite never transmit, that is (*X*=0, *Y*=1440), it is assumed that satellite would not be in the input file.
+- The available time is modeled as a vector with 1440 values, in which index 0 corresponds to the time point 00:00, and index 1439 corresponds to 23:59.
+- **The concept of total downlink is understood as the total data downloaded during a 30 minutes window**. It would be equivalent to calculating the 30 minutes integral of the aggregate rate curve.
+- There is not necessarily uniqueness in the 30 minutes window with maximum data downloading. Several such windows can be found. For instance, if there were only a single geostationary satellite in the input file, it would produce (1440-29)=1411 max load windows. Therefore, the developed solution returns a vector with all the maximum load periods found.
+- The program creates a file, called out.txt, in which it dumps the requested information.
+- The structure of the output file is as follows:
+	- In the first line, both the available ground station bandwidth and the maximum aggregate downlink rate are written. If the first quantity is greater than or equal to the second then "OK" is written, and otherwise "EXCEEDS" is written. For example **OK {maxAllowedRate: 45, currentMaxRate: 16}**
+	- The second line contains the number (*N*) of found max load windows.
+	- The following *N* lines contain, in **hh:mm,hh:mm** format, the max load window start and end time points.
+
+- As an improvement, it would be interesting that once the maximum load windows have been obtained, those that are contiguous are accumulated, and that what is written in the output file are the accumulated periods of maximum load. For example, instead of writing as 4 different windows **20:00,20:29**, **20:01,20:30**, **20:02,20:31** and **20:03,20:32**, only type the window **20:00,20:32**. However, as the specification expects 30 minute windows, this accumulation has not been implemented.
 
